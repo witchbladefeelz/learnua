@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  avatar    String?
+  level     Level    @default(A1)
+  xp        Int      @default(0)
+  streak    Int      @default(0)
+  lastActiveDate DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  progress    Progress[]
+  completedLessons CompletedLesson[]
+  achievements UserAchievement[]
+
+  @@map("users")
+}
+
+model Lesson {
+  id          String      @id @default(cuid())
+  title       String      @unique
+  description String?
+  category    Category
+  level       Level
+  order       Int
+  xpReward    Int         @default(10)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  exercises   Exercise[]
+  completedBy CompletedLesson[]
+
+  @@map("lessons")
+}
+
+model Exercise {
+  id          String      @id @default(cuid())
+  lessonId    String
+  type        ExerciseType
+  question    String
+  options     Json?       // For multiple choice options
+  correctAnswer String
+  audioUrl    String?     // For audio exercises
+  explanation String?
+  order       Int
+  xpReward    Int         @default(1)
+
+  // Relations
+  lesson      Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, order])
+  @@map("exercises")
+}
+
+model Progress {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String?
+  xpGained  Int      @default(0)
+  accuracy  Float?   // Percentage of correct answers
+  timeSpent Int?     // Time in seconds
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("progress")
+}
+
+model CompletedLesson {
+  id        String   @id @default(cuid())
+  userId    String
+  lessonId  String
+  score     Int      // Percentage score
+  xpEarned  Int
+  timeSpent Int      // Time in seconds
+  completedAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("completed_lessons")
+}
+
+model Achievement {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String
+  icon        String
+  requirement String // JSON string describing the requirement
+  xpReward    Int    @default(0)
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  // Relations
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+enum Level {
+  A1  // Beginner
+  A2  // Elementary
+  B1  // Intermediate
+  B2  // Upper Intermediate
+  C1  // Advanced
+  C2  // Proficient
+}
+
+enum Category {
+  GREETINGS    // Приветствия
+  FOOD         // Еда
+  FAMILY       // Семья
+  TRAVEL       // Путешествия
+  NUMBERS      // Числа
+  COLORS       // Цвета
+  CLOTHING     // Одежда
+  WEATHER      // Погода
+  TIME         // Время
+  HOBBIES      // Хобби
+}
+
+enum ExerciseType {
+  MULTIPLE_CHOICE    // Множественный выбор
+  TEXT_INPUT         // Ввод текста
+  WORD_ORDER         // Сборка предложения
+  AUDIO_CHOICE       // Прослушай и выбери
+  TRANSLATION        // Перевод
+}

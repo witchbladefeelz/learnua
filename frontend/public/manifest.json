@@ -1,0 +1,32 @@
+{
+  "short_name": "Ukrainian App",
+  "name": "Ukrainian Language Learning App",
+  "description": "Learn Ukrainian language through interactive lessons and exercises",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#f6741a",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "categories": ["education", "productivity"],
+  "lang": "uk",
+  "dir": "ltr",
+  "scope": "/",
+  "prefer_related_applications": false
+}
