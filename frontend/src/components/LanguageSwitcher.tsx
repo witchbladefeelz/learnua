@@ -5,11 +5,13 @@ import { supportedLanguages, Language } from '../i18n';
 interface LanguageSwitcherProps {
   className?: string;
   showLabels?: boolean;
+  variant?: 'default' | 'compact';
 }
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ 
   className = '',
-  showLabels = true 
+  showLabels = true,
+  variant = 'default',
 }) => {
   const { language, setLanguage } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -21,28 +23,36 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
     setIsOpen(false);
   };
 
+  const buttonClasses = variant === 'compact'
+    ? 'flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 dark:border-gray-700 bg-transparent text-lg text-gray-700 dark:text-gray-200 hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-transparent transition-colors duration-200'
+    : 'flex items-center space-x-2 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200';
+
+  const shouldShowLabels = showLabels && variant !== 'compact';
+
   return (
     <div className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+        className={buttonClasses}
       >
         <span className="text-lg">{currentLanguage?.flag}</span>
-        {showLabels && (
+        {shouldShowLabels && (
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {currentLanguage?.name}
           </span>
         )}
-        <svg
-          className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        {variant === 'default' && (
+          <svg
+            className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${
+              isOpen ? 'rotate-180' : ''
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        )}
       </button>
 
       {isOpen && (
@@ -54,7 +64,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           />
           
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 py-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+          <div className={`absolute right-0 ${variant === 'compact' ? 'mt-3' : 'mt-2'} py-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20`}>
             {supportedLanguages.map((lang) => (
               <button
                 key={lang.code}

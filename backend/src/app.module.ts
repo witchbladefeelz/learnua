@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { ProgressModule } from './progress/progress.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     LessonsModule,
     ProgressModule,
     AchievementsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

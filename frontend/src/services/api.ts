@@ -1,5 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
-import { CompletedLesson, LeaderboardUser, Lesson } from '../types';
+import {
+  CompletedLesson,
+  LeaderboardUser,
+  Lesson,
+  User,
+  LoginResponse,
+  PublicUserProfile,
+  AdminUserSummary,
+  AdminUpdateUserPayload,
+} from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
@@ -27,8 +36,14 @@ api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      const url: string = error.config?.url || '';
+      const authEndpoints = ['/auth/login', '/auth/register', '/auth/verify-email', '/auth/resend-verification'];
+      const isAuthRequest = authEndpoints.some(endpoint => url.includes(endpoint));
+
+      if (!isAuthRequest) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -42,20 +57,35 @@ export const authAPI = {
     api.post('/auth/login', data),
 
   register: (data: { email: string; password: string; name?: string }) =>
-    api.post('/auth/register', data),
+    api.post('/auth/register', data) as Promise<LoginResponse | { message: string }>,
 
   getProfile: () =>
-    api.get('/auth/profile'),
+    unwrap<{ user: User }>(api.get('/auth/profile')),
 };
 
 export const usersAPI = {
   getMe: () => unwrap<any>(api.get('/users/me')),
 
-  getUser: (id: string) => unwrap<any>(api.get(`/users/${id}`)),
+  getUser: (id: string) => unwrap<PublicUserProfile>(api.get(`/users/${id}`)),
 
   getLeaderboard: (limit?: number) =>
     unwrap<LeaderboardUser[]>(
       api.get(`/users/leaderboard${limit ? `?limit=${limit}` : ''}`),
+    ),
+
+  updateProfile: (data: {
+    avatar?: string;
+    name?: string;
+    email?: string;
+    currentPassword?: string;
+    newPassword?: string;
+  }) => unwrap<User>(api.patch('/users/me', data)),
+
+  uploadAvatar: (formData: FormData) =>
+    unwrap<User>(
+      api.patch('/users/me/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }),
     ),
 };
 
@@ -106,6 +136,16 @@ export const achievementsAPI = {
 
   check: () =>
     api.get('/achievements/check'),
+};
+
+export const adminAPI = {
+  getUsers: (params?: { skip?: number; take?: number; search?: string }) =>
+    unwrap<AdminUserSummary[]>(
+      api.get('/admin/users', { params }),
+    ),
+
+  updateUser: (id: string, data: AdminUpdateUserPayload) =>
+    unwrap<AdminUserSummary>(api.patch(`/admin/users/${id}`, data)),
 };
 
 export default api;

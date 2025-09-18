@@ -1,55 +1,73 @@
 services:
   postgres:
     image: postgres:15
-    container_name: uallearn_db
+    container_name: uallearn_postgres
+    env_file: .env
     environment:
-      POSTGRES_DB: uallearn
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-ukrainian_app}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - app-network
 
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: uallearn_backend
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/ukrainian_app}
+      EMAIL_VERIFICATION_ENABLED: ${EMAIL_VERIFICATION_ENABLED:-false}
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "3001:3001"
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/uallearn
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
-    depends_on:
-      - postgres
-    networks:
-      - app-network
     volumes:
       - ./backend:/app
-      - /app/node_modules
+      - backend_node_modules:/app/node_modules
+      - backend_uploads:/app/uploads
+    command: sh -c "npm install && npm run start:dev"
+    networks:
+      - app-network
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: uallearn_frontend
-    ports:
-      - "3000:3000"
+    env_file: .env
     environment:
-      REACT_APP_API_URL: http://localhost:3001
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:3001}
+      HOST: 0.0.0.0
+      CHOKIDAR_USEPOLLING: "true"
     depends_on:
       - backend
-    networks:
-      - app-network
+    ports:
+      - "3000:3000"
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+      - frontend_node_modules:/app/node_modules
+    command: sh -c "npm install && npm start"
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
+  backend_node_modules:
+  backend_uploads:
+  frontend_node_modules:
 
 networks:
   app-network:

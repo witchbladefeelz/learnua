@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
@@ -10,10 +10,14 @@ import LoadingSpinner from './components/ui/LoadingSpinner';
 import Home from './pages/Home';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import VerifyEmail from './pages/auth/VerifyEmail';
 import Dashboard from './pages/Dashboard';
 import Lessons from './pages/Lessons';
 import LessonDetail from './pages/LessonDetail';
 import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminRoute from './components/auth/AdminRoute';
 import Leaderboard from './pages/Leaderboard';
 import NotFound from './pages/NotFound';
 
@@ -21,10 +25,12 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   const { loading } = useAuth();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-100">
         <LoadingSpinner size="large" />
       </div>
     );
@@ -32,14 +38,15 @@ function App() {
 
   return (
     <LanguageProvider>
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 transition-colors duration-300">
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
         <Navbar />
-        <main className="container mx-auto px-4 py-8 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <main className={isHome ? 'flex-1' : 'container mx-auto px-4 py-8 flex-1 w-full'}>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
 
             {/* Protected routes */}
@@ -62,6 +69,16 @@ function App() {
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
+            } />
+            <Route path="/users/:id" element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
             } />
 
             {/* 404 route */}

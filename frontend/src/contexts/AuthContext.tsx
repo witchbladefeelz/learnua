@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { authAPI } from '../services/api';
-import { useTheme } from './ThemeContext';
-import { ThemePreference, User as AppUser } from '../types';
+import { User as AppUser, UserRole } from '../types';
 
 type User = AppUser;
 
@@ -10,7 +9,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name?: string) => Promise<void>;
+  register: (email: string, password: string, name?: string) => Promise<string | null>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
 }
@@ -33,19 +32,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
-  const { setTheme } = useTheme();
+  const DEFAULT_AVATAR = 'https://cdn.jsdelivr.net/gh/identicons/jasonlong/png/128/default.png';
 
-  const getStoredTheme = (userId?: string): ThemePreference | null => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-    if (userId) {
-      const userTheme = window.localStorage.getItem(`theme-${userId}`) as ThemePreference | null;
-      if (userTheme) {
-        return userTheme;
-      }
-    }
-    return window.localStorage.getItem('theme-preference') as ThemePreference | null;
+  const normalizeUser = (userData: Partial<User> | null): User | null => {
+    if (!userData) return null;
+    return {
+      ...userData,
+      emailVerified: Boolean(userData.emailVerified),
+      role: (userData.role as UserRole) || UserRole.USER,
+      avatar: userData.avatar || DEFAULT_AVATAR,
+      name: userData.name || userData.email || '',
+    } as User;
   };
 
   useEffect(() => {
@@ -53,13 +50,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const savedToken = localStorage.getItem('token');
       if (savedToken) {
         try {
-          // Verify token and get user profile
-          const response: any = await authAPI.getProfile();
-          setUser(response.user);
-          const storedTheme = getStoredTheme(response.user?.id);
-          if (storedTheme) {
-            setTheme(storedTheme);
-          }
+          const response = await authAPI.getProfile();
+          setUser(normalizeUser(response.user));
           setToken(savedToken);
         } catch (error) {
           // Token is invalid
@@ -68,29 +60,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null);
         }
       } else {
-        const storedTheme = getStoredTheme();
-        if (storedTheme) {
-          setTheme(storedTheme);
-        }
+        setToken(null);
+        setUser(null);
       }
       setLoading(false);
     };
 
     initAuth();
-  }, [setTheme]);
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const response: any = await authAPI.login({ email, password });
+      const response = await authAPI.login({ email, password }) as any;
       const { access_token, user: userData } = response;
       
       localStorage.setItem('token', access_token);
       setToken(access_token);
-      setUser(userData);
-      const storedTheme = getStoredTheme(userData?.id);
-      if (storedTheme) {
-        setTheme(storedTheme);
-      }
+      setUser(normalizeUser(userData));
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Login failed');
     }
@@ -98,16 +84,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (email: string, password: string, name?: string) => {
     try {
-      const response: any = await authAPI.register({ email, password, name });
-      const { access_token, user: userData } = response;
-      
-      localStorage.setItem('token', access_token);
-      setToken(access_token);
-      setUser(userData);
-      const storedTheme = getStoredTheme(userData?.id);
-      if (storedTheme) {
-        setTheme(storedTheme);
+      const response = await authAPI.register({ email, password, name });
+
+      if ('access_token' in response) {
+        localStorage.setItem('token', response.access_token);
+        setToken(response.access_token);
+        setUser(normalizeUser(response.user));
+        return null;
       }
+
+      localStorage.removeItem('token');
+      setToken(null);
+      setUser(null);
+      return response.message;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Registration failed');
     }
@@ -122,10 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateUser = (userData: Partial<User>) => {
     setUser(prev => {
       if (!prev) return null;
-      const updated = { ...prev, ...userData };
-      if (userData.theme) {
-        setTheme(userData.theme as ThemePreference);
-      }
+      const updated = normalizeUser({ ...prev, ...userData });
       return updated;
     });
   };

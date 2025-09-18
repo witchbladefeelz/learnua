@@ -1,10 +1,11 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -25,6 +26,21 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @ApiOperation({ summary: 'Verify email with token' })
+  @ApiResponse({ status: 200, description: 'Email verified successfully' })
+  @ApiResponse({ status: 400, description: 'Token invalid or expired' })
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    return this.authService.verifyEmail(token);
+  }
+
+  @ApiOperation({ summary: 'Resend verification email' })
+  @ApiResponse({ status: 200, description: 'Verification email resent' })
+  @Post('resend-verification')
+  async resendVerification(@Body() resendVerificationDto: ResendVerificationDto) {
+    return this.authService.resendVerification(resendVerificationDto);
   }
 
   @ApiOperation({ summary: 'Get current user profile' })

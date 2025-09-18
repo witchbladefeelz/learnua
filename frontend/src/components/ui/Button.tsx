@@ -40,6 +40,9 @@ const Button: React.FC<ButtonProps> = ({
 
   const isDisabled = disabled || loading;
 
+  const spinnerColor: 'primary' | 'secondary' | 'white' =
+    variant === 'outline' || variant === 'ghost' ? 'primary' : 'white';
+
   return (
     <button
       className={`
@@ -53,7 +56,7 @@ const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {loading && (
-        <LoadingSpinner size="small" color="white" className="mr-2" />
+        <LoadingSpinner size="small" color={spinnerColor} className="mr-2" />
       )}
       {!loading && leftIcon && (
         <span className="mr-2">{leftIcon}</span>

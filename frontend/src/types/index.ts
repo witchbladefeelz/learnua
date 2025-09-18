@@ -2,13 +2,14 @@
 export interface User {
   id: string;
   email: string;
+  emailVerified: boolean;
   name?: string;
+  role: UserRole;
   level: Level;
   xp: number;
   streak: number;
   avatar?: string;
   lastActiveDate?: string;
-  theme?: ThemePreference;
   createdAt: string;
   updatedAt: string;
 }
@@ -51,6 +52,21 @@ export interface CompletedLesson {
   timeSpent: number;
   completedAt: string;
   lesson?: Lesson;
+}
+
+export interface PublicUserProfile {
+  id: string;
+  name?: string | null;
+  avatar?: string | null;
+  role?: UserRole;
+  level: Level;
+  xp: number;
+  streak: number;
+  lastActiveDate?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completedLessons?: CompletedLesson[];
+  achievements?: UserAchievement[];
 }
 
 // Progress types
@@ -130,6 +146,32 @@ export interface AchievementProgress {
   completed: boolean;
 }
 
+export interface AdminUserSummary {
+  id: string;
+  email: string;
+  name?: string | null;
+  avatar?: string | null;
+  role: UserRole;
+  level: Level;
+  xp: number;
+  streak: number;
+  emailVerified: boolean;
+  lastActiveDate?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminUpdateUserPayload {
+  name?: string | null;
+  email?: string;
+  level?: Level;
+  xp?: number;
+  streak?: number;
+  role?: UserRole;
+  emailVerified?: boolean;
+  password?: string;
+}
+
 // Enums
 export enum Level {
   A1 = 'A1',
@@ -160,10 +202,9 @@ export enum ExerciseType {
   AUDIO_CHOICE = 'AUDIO_CHOICE',
   TRANSLATION = 'TRANSLATION',
 }
-
-export enum ThemePreference {
-  LIGHT = 'LIGHT',
-  DARK = 'DARK',
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
 }
 
 // API Response types

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { TrophyIcon, FireIcon, StarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -40,6 +41,42 @@ const Leaderboard: React.FC = () => {
     loadLeaderboard();
   }, [loadLeaderboard]);
 
+  const animalEmojis = ['🐶','🐱','🦊','🦁','🐻','🐼','🐨','🐯','🐰','🦄','🐸','🐧','🐹','🐦','🦉','🐙','🦋','🐢'];
+
+  const getFallbackEmoji = (id: string) => {
+    if (!id) {
+      return animalEmojis[0];
+    }
+    const hash = Array.from(id).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return animalEmojis[hash % animalEmojis.length];
+  };
+
+  const renderAvatar = (leader: LeaderboardUser, size: 'lg' | 'md' = 'md') => {
+    const circleSize = size === 'lg' ? 'w-16 h-16' : 'w-12 h-12';
+    const emojiSize = size === 'lg' ? 'text-3xl' : 'text-2xl';
+    const ringThickness = size === 'lg' ? 'ring-4' : 'ring-2';
+
+    if (leader.avatar) {
+      return (
+        <div className={`${circleSize} rounded-full overflow-hidden shadow-lg ${ringThickness} ring-white dark:ring-gray-800`}>
+          <img
+            src={leader.avatar}
+            alt={leader.name || 'User avatar'}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={`flex items-center justify-center ${circleSize} ${emojiSize} rounded-full bg-gradient-to-br from-primary-500/80 to-secondary-500/80 text-white shadow-lg ${ringThickness} ring-white dark:ring-gray-800`}
+      >
+        <span>{getFallbackEmoji(leader.id)}</span>
+      </div>
+    );
+  };
+
   const userPosition = useMemo(() => {
     if (!currentUser) return -1;
     return users.findIndex((user) => user.id === currentUser.id);
@@ -74,6 +111,9 @@ const Leaderboard: React.FC = () => {
         return 'bg-white dark:bg-gray-800';
     }
   };
+
+  const getProfileLink = (leaderId: string) =>
+    currentUser?.id === leaderId ? '/profile' : `/users/${leaderId}`;
 
   if (loading) {
     return (
@@ -125,67 +165,82 @@ const Leaderboard: React.FC = () => {
       {users.length >= 3 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* 2nd place */}
-          <Card className={`text-center space-y-4 order-2 md:order-1 ${getRankBg(1)} text-white`}>
-            <div className="text-3xl">🥈</div>
-            <div>
-              <div className="font-bold text-lg">{users[1].name || 'Student'}</div>
-              <div className="text-sm opacity-90">{users[1].level}</div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-center space-x-4 text-sm">
-                <span className="flex items-center space-x-1">
-                  <StarIcon className="w-4 h-4" />
-                  <span>{users[1].xp} XP</span>
-                </span>
-                <span className="flex items-center space-x-1">
-                  <FireIcon className="w-4 h-4" />
-                  <span>{users[1].streak}</span>
-                </span>
+          <Link to={getProfileLink(users[1].id)} className="block order-2 md:order-1">
+            <Card className={`text-center space-y-4 ${getRankBg(1)} text-white transition-transform hover:scale-105`}>
+              <div className="text-3xl">🥈</div>
+              <div className="flex justify-center">
+                {renderAvatar(users[1], 'lg')}
               </div>
-            </div>
-          </Card>
+              <div>
+                <div className="font-bold text-lg">{users[1].name || 'Student'}</div>
+                <div className="text-sm opacity-90">{users[1].level}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-center space-x-4 text-sm">
+                  <span className="flex items-center space-x-1">
+                    <StarIcon className="w-4 h-4" />
+                    <span>{users[1].xp} XP</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <FireIcon className="w-4 h-4" />
+                    <span>{users[1].streak}</span>
+                  </span>
+                </div>
+              </div>
+            </Card>
+          </Link>
 
           {/* 1st place */}
-          <Card className={`text-center space-y-4 order-1 md:order-2 transform scale-105 ${getRankBg(0)} text-white`}>
-            <div className="text-4xl">🥇</div>
-            <div>
-              <div className="font-bold text-xl">{users[0].name || 'Student'}</div>
-              <div className="text-sm opacity-90">{users[0].level}</div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-center space-x-4">
-                <span className="flex items-center space-x-1">
-                  <StarIcon className="w-5 h-5" />
-                  <span className="font-bold">{users[0].xp} XP</span>
-                </span>
-                <span className="flex items-center space-x-1">
-                  <FireIcon className="w-5 h-5" />
-                  <span className="font-bold">{users[0].streak}</span>
-                </span>
+          <Link to={getProfileLink(users[0].id)} className="block order-1 md:order-2">
+            <Card className={`text-center space-y-4 transform scale-105 ${getRankBg(0)} text-white transition-transform hover:scale-110`}>
+              <div className="text-4xl">🥇</div>
+              <div className="flex justify-center">
+                {renderAvatar(users[0], 'lg')}
               </div>
-            </div>
-          </Card>
+              <div>
+                <div className="font-bold text-xl">{users[0].name || 'Student'}</div>
+                <div className="text-sm opacity-90">{users[0].level}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-center space-x-4">
+                  <span className="flex items-center space-x-1">
+                    <StarIcon className="w-5 h-5" />
+                    <span className="font-bold">{users[0].xp} XP</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <FireIcon className="w-5 h-5" />
+                    <span className="font-bold">{users[0].streak}</span>
+                  </span>
+                </div>
+              </div>
+            </Card>
+          </Link>
 
           {/* 3rd place */}
-          <Card className={`text-center space-y-4 order-3 ${getRankBg(2)} text-white`}>
-            <div className="text-3xl">🥉</div>
-            <div>
-              <div className="font-bold text-lg">{users[2].name || 'Student'}</div>
-              <div className="text-sm opacity-90">{users[2].level}</div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-center space-x-4 text-sm">
-                <span className="flex items-center space-x-1">
-                  <StarIcon className="w-4 h-4" />
-                  <span>{users[2].xp} XP</span>
-                </span>
-                <span className="flex items-center space-x-1">
-                  <FireIcon className="w-4 h-4" />
-                  <span>{users[2].streak}</span>
-                </span>
+          <Link to={getProfileLink(users[2].id)} className="block order-3">
+            <Card className={`text-center space-y-4 ${getRankBg(2)} text-white transition-transform hover:scale-105`}>
+              <div className="text-3xl">🥉</div>
+              <div className="flex justify-center">
+                {renderAvatar(users[2], 'lg')}
               </div>
-            </div>
-          </Card>
+              <div>
+                <div className="font-bold text-lg">{users[2].name || 'Student'}</div>
+                <div className="text-sm opacity-90">{users[2].level}</div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-center space-x-4 text-sm">
+                  <span className="flex items-center space-x-1">
+                    <StarIcon className="w-4 h-4" />
+                    <span>{users[2].xp} XP</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <FireIcon className="w-4 h-4" />
+                    <span>{users[2].streak}</span>
+                  </span>
+                </div>
+              </div>
+            </Card>
+          </Link>
         </div>
       )}
 
@@ -202,8 +257,9 @@ const Leaderboard: React.FC = () => {
               const background = index < 3 ? 'bg-gray-50 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800';
 
               return (
-              <div
+              <Link
                   key={leader.id}
+                  to={getProfileLink(leader.id)}
                   className={`flex items-center space-x-4 p-4 rounded-lg transition-colors ${background} ${
                     isCurrent ? 'ring-2 ring-primary-400 ring-offset-2 dark:ring-offset-gray-900' : ''
                   }`}
@@ -211,7 +267,10 @@ const Leaderboard: React.FC = () => {
                 <div className="flex-shrink-0">
                   {getRankIcon(index)}
                 </div>
-                
+                <div className="flex-shrink-0">
+                  {renderAvatar(leader)}
+                </div>
+
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900 dark:text-gray-100">
                     {leader.name || `Student ${leader.id.slice(-4)}`}
@@ -229,7 +288,7 @@ const Leaderboard: React.FC = () => {
                     <span>{leader.streak}</span>
                   </span>
                 </div>
-              </div>
+              </Link>
             );
             })}
           </div>
