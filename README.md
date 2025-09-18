@@ -179,3 +179,4 @@ ukrainian-app/
 MIT License - свободно для образовательных целей.
 # ualearn
 # ualearn
+# learnua
