@@ -15,9 +15,20 @@ async function bootstrap() {
   }
   app.useStaticAssets(uploadsPath, { prefix: '/uploads/' });
 
-  // Enable CORS for frontend
+  // Enable CORS for frontend (support multiple comma-separated origins)
+  const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} is not allowed by CORS`));
+      }
+    },
     credentials: true,
   });
 
