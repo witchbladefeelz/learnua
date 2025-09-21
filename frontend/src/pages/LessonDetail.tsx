@@ -9,6 +9,7 @@ import { Exercise, ExerciseType, Lesson } from '../types';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import PageContainer from '../components/layout/PageContainer';
 
 interface LessonDetailData extends Lesson {
   exercises: Exercise[];
@@ -207,29 +208,30 @@ const LessonDetail: React.FC = () => {
 
   if (completedLesson) {
     return (
-      <div className="max-w-3xl mx-auto space-y-8 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-        <Card className="text-center space-y-6">
-          <div className="text-5xl">🎉</div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            {t('lesson.completed')}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            {t('lesson.earnedXP', { xp: completedLesson.xpEarned })}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
-            <div className="bg-primary-50 rounded-xl p-4">
-              <div className="text-xs font-semibold text-primary-600 uppercase">
+      <PageContainer>
+        <div className="surface-panel max-w-3xl mx-auto space-y-10 text-slate-100">
+          <div className="text-center space-y-6">
+            <div className="text-5xl">🎉</div>
+            <h1 className="text-3xl font-semibold">{t('lesson.completed')}</h1>
+            <p className="text-lg text-slate-300">
+              {t('lesson.earnedXP', { xp: completedLesson.xpEarned })}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-100">
+            <div className="rounded-xl p-4 bg-primary-500/10 border border-primary-500/30">
+              <div className="text-xs font-semibold uppercase tracking-wide text-primary-200">
                 {t('lessons.score', { score: completedLesson.score })}
               </div>
-              <div className="text-2xl font-bold text-primary-700 mt-1">
+              <div className="text-2xl font-bold text-primary-200 mt-1">
                 {completedLesson.score}%
               </div>
             </div>
-            <div className="bg-secondary-50 rounded-xl p-4">
-              <div className="text-xs font-semibold text-secondary-600 uppercase">
+            <div className="rounded-xl p-4 bg-secondary-500/10 border border-secondary-500/30">
+              <div className="text-xs font-semibold uppercase tracking-wide text-secondary-200">
                 {t('lessons.xpReward')}
               </div>
-              <div className="text-2xl font-bold text-secondary-700 mt-1">
+              <div className="text-2xl font-bold text-secondary-200 mt-1">
                 {completedLesson.xpEarned} XP
               </div>
             </div>
@@ -243,8 +245,8 @@ const LessonDetail: React.FC = () => {
               {t('dashboard.continueStudying')}
             </Button>
           </div>
-        </Card>
-      </div>
+        </div>
+      </PageContainer>
     );
   }
 
@@ -253,101 +255,95 @@ const LessonDetail: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <div className="text-center space-y-3">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">
-          {lesson.title}
-        </h1>
-        {lesson.description && (
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            {lesson.description}
-          </p>
-        )}
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {currentIndex + 1} / {lesson.exercises.length}
-        </div>
-      </div>
-
-      <Card className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            {t('lesson.question')} {currentIndex + 1}
-          </h2>
-          <p className="text-lg text-gray-800 dark:text-gray-200">
-            {currentExercise.question}
-          </p>
-        </div>
-
-        {currentExercise.type === ExerciseType.MULTIPLE_CHOICE && currentExercise.options && (
-          <div className="grid grid-cols-1 gap-3">
-            {currentExercise.options.map((option, index) => (
-              <button
-                key={`${option}-${index}`}
-                onClick={() => setSelectedOption(option)}
-                className={`text-left px-4 py-3 rounded-lg border transition-colors ${
-                  selectedOption === option
-                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300'
-                    : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700'
-                }`}
-                disabled={showFeedback}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {currentExercise.type === ExerciseType.TEXT_INPUT && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('lesson.exercise.textInput')}
-            </label>
-            <input
-              type="text"
-              value={textAnswer}
-              onChange={(event) => setTextAnswer(event.target.value)}
-              disabled={showFeedback}
-              className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 dark:text-gray-100"
-              placeholder={t('lesson.exercise.textInput')}
-            />
-          </div>
-        )}
-
-        {showFeedback && isCurrentCorrect !== null && (
-          <div
-            className={`rounded-lg px-4 py-3 text-sm font-medium flex items-center gap-2 ${
-              isCurrentCorrect
-                ? 'bg-green-50 text-green-700 border border-green-100 dark:bg-green-500/10 dark:text-green-300 dark:border-green-500/30'
-                : 'bg-red-50 text-red-600 border border-red-100 dark:bg-red-500/10 dark:text-red-300 dark:border-red-500/30'
-            }`}
-          >
-            {isCurrentCorrect ? '✅ ' + t('lesson.correct') : '❌ ' + t('lesson.incorrect')}
-          </div>
-        )}
-
-        <div className="flex flex-col sm:flex-row gap-3 justify-between">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/lessons')}
-            disabled={completing}
-          >
-            {t('lesson.backToLessons')}
-          </Button>
-
-          {showFeedback ? (
-            <Button onClick={goToNextExercise} loading={completing}>
-              {currentIndex === lesson.exercises.length - 1
-                ? t('lesson.finish')
-                : t('lesson.nextQuestion')}
-            </Button>
-          ) : (
-            <Button onClick={handleCheckAnswer}>
-              {t('lesson.checkAnswer')}
-            </Button>
+    <PageContainer>
+      <div className="surface-panel max-w-3xl mx-auto space-y-8 text-slate-100">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl md:text-4xl font-semibold">{lesson.title}</h1>
+          {lesson.description && (
+            <p className="text-lg text-slate-300">{lesson.description}</p>
           )}
+          <div className="text-sm text-slate-400">
+            {currentIndex + 1} / {lesson.exercises.length}
+          </div>
         </div>
-      </Card>
-    </div>
+
+        <Card className="space-y-6 bg-white/5 border-white/10">
+          <div>
+            <h2 className="text-xl font-semibold mb-2">{t('lesson.question')} {currentIndex + 1}</h2>
+            <p className="text-lg text-slate-100">{currentExercise.question}</p>
+          </div>
+
+          {currentExercise.type === ExerciseType.MULTIPLE_CHOICE && currentExercise.options && (
+            <div className="grid grid-cols-1 gap-3">
+              {currentExercise.options.map((option, index) => (
+                <button
+                  key={`${option}-${index}`}
+                  onClick={() => setSelectedOption(option)}
+                  className={`text-left px-4 py-3 rounded-lg border transition-colors ${
+                    selectedOption === option
+                      ? 'border-primary-500 bg-primary-500/10 text-primary-200'
+                      : 'border-white/10 bg-white/5 hover:bg-white/10 text-slate-200'
+                  }`}
+                  disabled={showFeedback}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {currentExercise.type === ExerciseType.TEXT_INPUT && (
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                {t('lesson.exercise.textInput')}
+              </label>
+              <input
+                type="text"
+                value={textAnswer}
+                onChange={(event) => setTextAnswer(event.target.value)}
+                disabled={showFeedback}
+                className="w-full px-4 py-3 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-slate-900/60 text-slate-100"
+                placeholder={t('lesson.exercise.textInput')}
+              />
+            </div>
+          )}
+
+          {showFeedback && isCurrentCorrect !== null && (
+            <div
+              className={`rounded-lg px-4 py-3 text-sm font-medium flex items-center gap-2 ${
+                isCurrentCorrect
+                  ? 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/30'
+                  : 'bg-red-500/10 text-red-200 border border-red-400/30'
+              }`}
+            >
+              {isCurrentCorrect ? '✅ ' + t('lesson.correct') : '❌ ' + t('lesson.incorrect')}
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-between">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/lessons')}
+              disabled={completing}
+            >
+              {t('lesson.backToLessons')}
+            </Button>
+
+            {showFeedback ? (
+              <Button onClick={goToNextExercise} loading={completing}>
+                {currentIndex === lesson.exercises.length - 1
+                  ? t('lesson.finish')
+                  : t('lesson.nextQuestion')}
+              </Button>
+            ) : (
+              <Button onClick={handleCheckAnswer}>
+                {t('lesson.checkAnswer')}
+              </Button>
+            )}
+          </div>
+        </Card>
+      </div>
+    </PageContainer>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
+import PageContainer from '../components/layout/PageContainer';
 import { HomeIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from '../contexts/LanguageContext';
 
@@ -9,17 +9,12 @@ const NotFound: React.FC = () => {
   const { t } = useTranslation();
   
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16 text-gray-900 transition-colors duration-300 dark:text-gray-100">
-      <Card
-        className="max-w-xl w-full text-center space-y-8 bg-white/90 dark:bg-gray-900/85 border border-gray-200 dark:border-gray-700 shadow-xl backdrop-blur"
-        hover={false}
-      >
+    <PageContainer>
+      <div className="surface-panel max-w-xl mx-auto text-center space-y-8 text-slate-100">
         <div className="space-y-4">
           <div className="text-6xl">🤔</div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100">
-            404 - Page Not Found
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+          <h1 className="text-4xl font-semibold">404 - Page Not Found</h1>
+          <p className="text-lg text-slate-300 max-w-md mx-auto">
             Looks like you're lost. This page doesn't exist or has been moved.
           </p>
         </div>
@@ -30,11 +25,9 @@ const NotFound: React.FC = () => {
               Back to Home
             </Button>
           </Link>
-          
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            Or try:
-          </div>
-          
+
+          <div className="text-sm text-slate-400">Or try:</div>
+
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/lessons">
               <Button variant="outline">{t('nav.lessons')}</Button>
@@ -47,8 +40,8 @@ const NotFound: React.FC = () => {
             </Link>
           </div>
         </div>
-      </Card>
-    </div>
+      </div>
+    </PageContainer>
   );
 };
 

@@ -7,6 +7,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import ProgressBar from '../components/ui/ProgressBar';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import PageContainer from '../components/layout/PageContainer';
 import { 
   BookOpenIcon, 
   TrophyIcon, 
@@ -85,231 +86,211 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      {/* Welcome Section */}
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">
-          {t('dashboard.welcomeBack')}, {user?.name || 'Student'}! 👋
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300">
-          Continue learning Ukrainian language
-        </p>
-      </div>
+    <PageContainer>
+      <div className="surface-panel space-y-12 text-slate-100">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl md:text-4xl font-semibold">
+            {t('dashboard.welcomeBack')}, {user?.name || 'Student'}! 👋
+          </h1>
+          <p className="text-lg text-slate-300">
+            Continue learning Ukrainian language
+          </p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="text-center space-y-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center mx-auto">
-            <BookOpenIcon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {stats?.completedLessons || 0}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="text-center space-y-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center mx-auto">
+              <BookOpenIcon className="w-6 h-6 text-white" />
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.stats.lessonsCompleted')}</div>
-          </div>
-        </Card>
-
-        <Card className="text-center space-y-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto">
-            <TrophyIcon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {user?.xp || 0}
+            <div>
+              <div className="text-2xl font-bold">{stats?.completedLessons || 0}</div>
+              <div className="text-sm text-slate-300">{t('dashboard.stats.lessonsCompleted')}</div>
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.stats.xp')}</div>
-          </div>
-        </Card>
+          </Card>
 
-        <Card className="text-center space-y-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto">
-            <FireIcon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {streak?.currentStreak || 0}
+          <Card className="text-center space-y-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-secondary-600 rounded-lg flex items-center justify-center mx-auto">
+              <TrophyIcon className="w-6 h-6 text-white" />
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">{t('dashboard.stats.streak')}</div>
-          </div>
-        </Card>
-
-        <Card className="text-center space-y-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mx-auto">
-            <ChartBarIcon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {stats?.averageAccuracy || 0}%
+            <div>
+              <div className="text-2xl font-bold">{user?.xp || 0}</div>
+              <div className="text-sm text-slate-300">{t('dashboard.stats.xp')}</div>
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Accuracy</div>
-          </div>
-        </Card>
-      </div>
+          </Card>
 
-      {/* Progress Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Overall Progress */}
-        <Card>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Overall Progress
-              </h3>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {t('dashboard.stats.level')} {user?.level}
-              </span>
+          <Card className="text-center space-y-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto">
+              <FireIcon className="w-6 h-6 text-white" />
             </div>
+            <div>
+              <div className="text-2xl font-bold">{streak?.currentStreak || 0}</div>
+              <div className="text-sm text-slate-300">{t('dashboard.stats.streak')}</div>
+            </div>
+          </Card>
 
-            <div className="space-y-4">
-              <ProgressBar
-                value={stats?.completedLessons || 0}
-                max={stats?.totalLessons || 1}
-                label="Lessons Completed"
-                color="primary"
-              />
+          <Card className="text-center space-y-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mx-auto">
+              <ChartBarIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{stats?.averageAccuracy || 0}%</div>
+              <div className="text-sm text-slate-300">Accuracy</div>
+            </div>
+          </Card>
+        </div>
 
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-primary-600 dark:text-primary-300">
-                    {stats?.completionRate || 0}%
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Card>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Overall Progress</h3>
+                <span className="text-sm text-slate-400">
+                  {t('dashboard.stats.level')} {user?.level}
+                </span>
+              </div>
+
+              <div className="space-y-4">
+                <ProgressBar
+                  value={stats?.completedLessons || 0}
+                  max={stats?.totalLessons || 1}
+                  label="Lessons Completed"
+                  color="primary"
+                />
+
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-primary-300">
+                      {stats?.completionRate || 0}%
+                    </div>
+                    <div className="text-sm text-slate-300">Completed</div>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Completed</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-secondary-600 dark:text-secondary-300">
-                    {stats?.activeDays || 0}
+                  <div>
+                    <div className="text-2xl font-bold text-secondary-300">
+                      {stats?.activeDays || 0}
+                    </div>
+                    <div className="text-sm text-slate-300">Active Days</div>
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-300">Active Days</div>
                 </div>
               </div>
+
+              <Link to="/lessons">
+                <Button fullWidth leftIcon={<PlayIcon className="w-4 h-4" />}>
+                  {t('dashboard.continueStudying')}
+                </Button>
+              </Link>
             </div>
+          </Card>
 
-            <Link to="/lessons">
-              <Button fullWidth leftIcon={<PlayIcon className="w-4 h-4" />}>
-                {t('dashboard.continueStudying')}
-              </Button>
-            </Link>
-          </div>
-        </Card>
-
-        {/* Streak Info */}
-        <Card>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Streak System
-              </h3>
-              <FireIcon className="w-6 h-6 text-orange-500" />
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="text-4xl font-bold text-orange-500">
-                🔥 {streak?.currentStreak || 0}
+          <Card>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Streak System</h3>
+                <FireIcon className="w-6 h-6 text-orange-500" />
               </div>
-              <div className="text-lg text-gray-900 dark:text-gray-100">
-                {streak?.isActiveToday ? 'You studied today!' : 'Study today!'}
-              </div>
-              
-              {streak && (
-                <div className="space-y-2">
-                  <div className="text-sm text-gray-600 dark:text-gray-300">
-                    Until next reward: {streak.nextMilestone - streak.currentStreak} days
-                  </div>
-                  <ProgressBar
-                    value={streak.currentStreak}
-                    max={streak.nextMilestone}
-                    color="warning"
-                    showPercentage={false}
-                  />
+
+              <div className="text-center space-y-4">
+                <div className="text-4xl font-bold text-orange-500">
+                  🔥 {streak?.currentStreak || 0}
                 </div>
+                <div className="text-lg">
+                  {streak?.isActiveToday ? 'You studied today!' : 'Study today!'}
+                </div>
+
+                {streak && (
+                  <div className="space-y-2">
+                    <div className="text-sm text-slate-300">
+                      Until next reward: {streak.nextMilestone - streak.currentStreak} days
+                    </div>
+                    <ProgressBar
+                      value={streak.currentStreak}
+                      max={streak.nextMilestone}
+                      color="warning"
+                      showPercentage={false}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {!streak?.isActiveToday && (
+                <Link to="/lessons">
+                  <Button variant="outline" fullWidth>
+                    Study Today
+                  </Button>
+                </Link>
               )}
             </div>
-
-            {!streak?.isActiveToday && (
-              <Link to="/lessons">
-                <Button variant="outline" fullWidth>
-                  Study Today
-                </Button>
-              </Link>
-            )}
-          </div>
-        </Card>
-      </div>
-
-      {/* Recent Lessons */}
-      <Card>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {t('dashboard.recentLessons')}
-            </h3>
-            <Link to="/lessons">
-              <Button variant="ghost" size="small">
-                All Lessons
-              </Button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {recentLessons.map((lesson) => (
-              <Card key={lesson.id} className="space-y-3" padding="small">
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100">{lesson.title}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{lesson.category}</p>
-                  </div>
-                  <span className="text-xs bg-primary-100 text-primary-800 dark:bg-primary-500/10 dark:text-primary-200 px-2 py-1 rounded">
-                    {lesson.level}
-                  </span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    +{lesson.xpReward} XP
-                  </span>
-                  <Link to={`/lessons/${lesson.id}`}>
-                    <Button size="small">
-                      {lesson.completedBy?.length > 0 ? 'Review' : 'Start'}
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-            ))}
-          </div>
+          </Card>
         </div>
-      </Card>
 
-      {/* Recent Achievements */}
-      {achievements.length > 0 && (
         <Card>
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {t('dashboard.recentAchievements')}
-              </h3>
-              <Link to="/profile">
+              <h3 className="text-lg font-semibold">{t('dashboard.recentLessons')}</h3>
+              <Link to="/lessons">
                 <Button variant="ghost" size="small">
-                  All Achievements
+                  All Lessons
                 </Button>
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {achievements.map((achievement) => (
-                <div key={achievement.id} className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                  <div className="text-2xl">{achievement.achievement.icon}</div>
-                  <div>
-                    <div className="font-medium text-gray-900 dark:text-gray-100">{achievement.achievement.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{achievement.achievement.description}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {recentLessons.map((lesson) => (
+                <Card key={lesson.id} className="space-y-3 bg-white/5 border-white/10" padding="small">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                      <h4 className="font-medium text-slate-100">{lesson.title}</h4>
+                      <p className="text-sm text-slate-300">{lesson.category}</p>
+                    </div>
+                    <span className="text-xs bg-primary-500/10 text-primary-200 px-2 py-1 rounded">
+                      {lesson.level}
+                    </span>
                   </div>
-                </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-400">+{lesson.xpReward} XP</span>
+                    <Link to={`/lessons/${lesson.id}`}>
+                      <Button size="small">
+                        {lesson.completedBy?.length > 0 ? 'Review' : 'Start'}
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
               ))}
             </div>
           </div>
         </Card>
-      )}
-    </div>
+
+        {achievements.length > 0 && (
+          <Card>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">{t('dashboard.recentAchievements')}</h3>
+                <Link to="/profile">
+                  <Button variant="ghost" size="small">
+                    All Achievements
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {achievements.map((achievement) => (
+                  <div
+                    key={achievement.id}
+                    className="flex items-center space-x-3 p-3 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <div className="text-2xl">{achievement.achievement.icon}</div>
+                    <div>
+                      <div className="font-medium text-slate-100">{achievement.achievement.name}</div>
+                      <div className="text-sm text-slate-300">{achievement.achievement.description}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+    </PageContainer>
   );
 };
 

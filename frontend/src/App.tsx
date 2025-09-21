@@ -40,7 +40,7 @@ function App() {
     <LanguageProvider>
       <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
         <Navbar />
-        <main className={isHome ? 'flex-1' : 'container mx-auto px-4 py-8 flex-1 w-full'}>
+        <main className={isHome ? 'flex-1' : 'flex-1 w-full relative'}>
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Home />} />
