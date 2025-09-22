@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { SparklesIcon, BookOpenIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import toast from 'react-hot-toast';
+
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
 import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
-import toast from 'react-hot-toast';
+import PageContainer from '../../components/layout/PageContainer';
 
 const Register: React.FC = () => {
   const { t } = useTranslation();
@@ -53,34 +55,78 @@ const Register: React.FC = () => {
     }
   };
 
+  const inputClassName =
+    'w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40 transition-all';
+  const requiredLabel = t('auth.requiredFields');
+  const resolvedRequiredLabel = requiredLabel === 'auth.requiredFields' ? 'Required fields' : requiredLabel;
+
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 text-gray-900 dark:text-gray-100">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">🇺🇦</span>
+    <PageContainer contentClassName="w-full max-w-5xl mx-auto">
+      <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr]">
+        <div className="surface-panel space-y-6 overflow-hidden">
+          <div className="relative">
+            <div className="absolute -top-24 -left-10 h-40 w-40 rounded-full bg-secondary-400/30 blur-3xl" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white/80">
+              <SparklesIcon className="h-4 w-4" />
+              {t('auth.register')}
+            </span>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            {t('auth.register')}
-          </h2>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-            Or{' '}
-            <Link
-              to="/login"
-              className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
-            >
-              {t('auth.hasAccount')}
-            </Link>
+          <h1 className="text-4xl font-semibold text-white">
+            {t('home.getStarted')}
+          </h1>
+          <p className="text-lg text-slate-300">
+            Join a growing community of learners and track your Ukrainian progress every day.
           </p>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+                <BookOpenIcon className="h-4 w-4 text-primary-200" />
+                Interactive lessons
+              </div>
+              <p className="mt-2 text-sm text-slate-400">
+                Practice vocabulary, grammar and listening with bite-sized exercises.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+                <ShieldCheckIcon className="h-4 w-4 text-emerald-200" />
+                Safe & free
+              </div>
+              <p className="mt-2 text-sm text-slate-400">
+                Secure authentication and no hidden costs — just pure learning.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+            <p>
+              {t('auth.hasAccount')}{' '}
+              <Link to="/login" className="text-primary-200 underline decoration-primary-400/60 hover:decoration-primary-100">
+                {t('auth.login')}
+              </Link>
+            </p>
+          </div>
         </div>
 
-        <Card className="bg-white/90 dark:bg-gray-900/85 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 shadow-xl backdrop-blur">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.name')}
-              </label>
-              <div className="mt-1">
+        <div className="surface-panel relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-secondary-500/10 to-transparent" />
+          <div className="relative space-y-6">
+            <div className="text-center space-y-2">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg shadow-primary-500/30">
+                <span className="text-2xl">🇺🇦</span>
+              </div>
+              <h2 className="text-2xl font-semibold text-white">{t('auth.register')}</h2>
+              <p className="text-sm text-slate-300">
+                Create an account to save your progress and unlock achievements.
+              </p>
+            </div>
+
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium text-slate-200">
+                  {t('auth.name')}
+                </label>
                 <input
                   id="name"
                   name="name"
@@ -88,17 +134,15 @@ const Register: React.FC = () => {
                   autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 dark:text-gray-100"
-                  placeholder="Your name"
+                  className={inputClassName}
+                  placeholder={t('auth.name') === 'auth.name' ? 'Your name' : t('auth.name')}
                 />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email *
-              </label>
-              <div className="mt-1">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium text-slate-200">
+                  Email *
+                </label>
                 <input
                   id="email"
                   name="email"
@@ -107,17 +151,15 @@ const Register: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 dark:text-gray-100"
+                  className={inputClassName}
                   placeholder="your@email.com"
                 />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.password')} *
-              </label>
-              <div className="mt-1">
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium text-slate-200">
+                  {t('auth.password')} *
+                </label>
                 <input
                   id="password"
                   name="password"
@@ -126,17 +168,15 @@ const Register: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 dark:text-gray-100"
-                  placeholder="Minimum 6 characters"
+                  className={inputClassName}
+                  placeholder="••••••"
                 />
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('auth.confirmPassword')} *
-              </label>
-              <div className="mt-1">
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="text-sm font-medium text-slate-200">
+                  {t('auth.confirmPassword')} *
+                </label>
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -145,17 +185,15 @@ const Register: React.FC = () => {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 dark:text-gray-100"
-                  placeholder="Repeat password"
+                  className={inputClassName}
+                  placeholder="••••••"
                 />
               </div>
-            </div>
 
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              * - required fields
-            </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-slate-400">
+                * {resolvedRequiredLabel}
+              </div>
 
-            <div>
               <Button
                 type="submit"
                 fullWidth
@@ -164,17 +202,15 @@ const Register: React.FC = () => {
               >
                 {t('auth.register')}
               </Button>
-            </div>
-          </form>
+            </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              By creating an account, you agree that this application is completely free and created for educational purposes
+            <p className="text-center text-xs text-slate-400">
+              By creating an account you agree to our educational use policy and free-of-charge experience.
             </p>
           </div>
-        </Card>
+        </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
