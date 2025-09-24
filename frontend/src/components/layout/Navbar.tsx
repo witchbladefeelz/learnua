@@ -92,9 +92,9 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex justify-center pointer-events-none">
+    <header className="fixed inset-x-0 top-3 sm:top-5 z-50 flex justify-center pointer-events-none">
 
-      <div className="w-full max-w-6xl px-4 mt-4 sm:mt-6 pointer-events-auto">
+      <div className="w-full max-w-6xl px-4 pointer-events-auto">
         <div className="flex items-center justify-between gap-4 rounded-full border border-white/10 bg-white/5 px-4 py-3 shadow-[0_24px_70px_rgba(15,23,42,0.55)] backdrop-blur-2xl md:px-6">
           <Link to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-600 text-xl font-semibold text-white shadow-lg shadow-primary-500/40">
