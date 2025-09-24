@@ -1,270 +1,248 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { useTranslation } from '../../contexts/LanguageContext';
 import {
+  Bars3Icon,
+  XMarkIcon,
   HomeIcon,
   BookOpenIcon,
   ChartBarIcon,
-  UserIcon,
   TrophyIcon,
-  Bars3Icon,
-  XMarkIcon,
   ArrowRightOnRectangleIcon,
+  UserIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
+
+import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/LanguageContext';
 import LanguageSwitcher from '../LanguageSwitcher';
+import Button from '../ui/Button';
+
+interface NavItem {
+  key: string;
+  labelKey: string;
+  path: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  auth?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { key: 'home', labelKey: 'nav.home', path: '/', icon: HomeIcon },
+  { key: 'dashboard', labelKey: 'dashboard.title', path: '/dashboard', icon: ChartBarIcon, auth: true },
+  { key: 'lessons', labelKey: 'nav.lessons', path: '/lessons', icon: BookOpenIcon, auth: true },
+  { key: 'leaderboard', labelKey: 'nav.leaderboard', path: '/leaderboard', icon: TrophyIcon },
+];
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isHome = location.pathname === '/';
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const visibleItems = useMemo(
+    () => NAV_ITEMS.filter((item) => (item.auth ? Boolean(user) : true)),
+    [user],
+  );
+
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
+
+  const linkClasses = (active: boolean) =>
+    `group relative inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+      active
+        ? 'bg-white text-slate-900 shadow-[0_10px_30px_rgba(255,255,255,0.25)]'
+        : 'text-white/70 hover:text-white hover:bg-white/10'
+    }`;
 
   const handleLogout = () => {
     logout();
+    setMobileOpen(false);
     navigate('/');
-    setMobileMenuOpen(false);
   };
 
-  const navigation = [
-    { name: t('nav.home'), href: '/', icon: HomeIcon, public: true },
-    { name: t('dashboard.title'), href: '/dashboard', icon: ChartBarIcon, auth: true },
-    { name: t('nav.lessons'), href: '/lessons', icon: BookOpenIcon, auth: true },
-    { name: t('nav.leaderboard'), href: '/leaderboard', icon: TrophyIcon, public: true },
-  ];
+  const navigateToProfile = () => {
+    setMobileOpen(false);
+    navigate('/profile');
+  };
 
-  const filteredNavigation = navigation.filter(item => {
-    if (item.public) return true;
-    if (!user) return false;
-    return Boolean(item.auth);
-  });
-
-  const getNavLinkClass = (active: boolean) => {
-    if (isHome) {
-      return `flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-        active ? 'text-white bg-white/10' : 'text-slate-200 hover:text-white hover:bg-white/10'
-      }`;
+  const renderAvatar = () => {
+    if (user?.avatar) {
+      return (
+        <span className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-white/5">
+          <img
+            src={user.avatar}
+            alt={user.name || user.email || 'User avatar'}
+            className="h-full w-full object-cover"
+          />
+        </span>
+      );
     }
 
-    return `flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-      active
-        ? 'text-primary-600 bg-primary-50 dark:bg-primary-500/10 dark:text-primary-300'
-        : 'text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-    }`;
+    const fallback = (user?.name || user?.email || 'U')[0]?.toUpperCase();
+    return (
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 text-base font-semibold text-white shadow-lg shadow-primary-500/40">
+        {fallback}
+      </span>
+    );
   };
-
-  const navClass = isHome
-    ? 'sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10 text-white transition-colors duration-300'
-    : 'sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-lg dark:shadow-none transition-colors duration-300';
-
-  const quickMenuClass = isHome
-    ? 'flex items-center gap-3 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white shadow-sm backdrop-blur'
-    : 'flex items-center gap-3 px-4 py-2 rounded-full bg-white/80 dark:bg-gray-900/80 border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur';
-
-  const dividerClass = isHome ? 'h-6 w-px bg-white/20' : 'h-6 w-px bg-gray-200 dark:bg-gray-700';
-
-  const secondaryButtonClass = isHome
-    ? 'px-3 py-1.5 rounded-lg text-sm font-medium text-slate-200 hover:text-white hover:bg-white/10 transition-colors'
-    : 'px-3 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors';
-
-  const primaryButtonClass = isHome
-    ? 'px-3 py-1.5 rounded-lg text-sm font-medium bg-primary-500/80 hover:bg-primary-500 text-white transition-colors'
-    : 'px-3 py-1.5 rounded-lg text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 transition-colors';
-
-  const mobileContainerClass = isHome
-    ? 'md:hidden bg-slate-900/95 border-t border-white/10 text-white backdrop-blur-xl'
-    : 'md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800';
-
-  const mobileLinkClass = (active: boolean) => {
-    if (isHome) {
-      return `flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium ${
-        active ? 'text-white bg-white/10' : 'text-slate-200 hover:text-white hover:bg-white/10'
-      }`;
-    }
-    return `flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium ${
-      active
-        ? 'text-primary-600 bg-primary-50 dark:bg-primary-500/10 dark:text-primary-300'
-        : 'text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-    }`;
-  };
-
-  const mobileSecondaryClass = isHome
-    ? 'flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:text-white hover:bg-white/10'
-    : 'flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-gray-50 dark:hover:bg-gray-800';
-
-  const mobileLogoutClass = isHome
-    ? 'w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:text-red-300 hover:bg-white/10'
-    : 'w-full flex items-center justify-center gap-2 px-3 py-2 rounded-md text-base font-medium text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800';
 
   return (
-    <nav className={navClass}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">🇺🇦</span>
-              </div>
-              <span className={`text-xl font-bold ${isHome ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
-                UAlearn
-              </span>
-            </Link>
-          </div>
+    <header className="sticky top-0 z-40">
 
-          <div className="hidden md:flex items-center space-x-8">
-            {filteredNavigation.map((item) => {
-              const Icon = item.icon;
-              const active = location.pathname === item.href;
-              return (
-                <Link key={item.name} to={item.href} className={getNavLinkClass(active)}>
-                  <Icon className="w-4 h-4" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="hidden md:flex items-center">
-            <div className={quickMenuClass}>
-              {user && (
-                <>
-                  <div className="text-right">
-                    <div className={`text-sm font-medium ${isHome ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
-                      {user.name || user.email}
-                    </div>
-                    <div className={`text-xs ${isHome ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
-                      {user.level} • {user.xp} XP • 🔥 {user.streak}
-                    </div>
-                  </div>
-                  <span className={dividerClass} />
-                </>
-              )}
-
-              <LanguageSwitcher variant="compact" showLabels={false} />
-
-              <span className={dividerClass} />
-
-              {user ? (
-                <div className="flex items-center gap-2">
-                  <Link to="/profile" className={secondaryButtonClass}>
-                    <UserIcon className="w-4 h-4" />
-                    <span>{t('nav.profile')}</span>
-                  </Link>
-                  <button onClick={handleLogout} className={secondaryButtonClass}>
-                    <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                    <span>{t('nav.logout')}</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link to="/login" className={secondaryButtonClass}>
-                    {t('auth.login')}
-                  </Link>
-                  <Link to="/register" className={primaryButtonClass}>
-                    {t('auth.register')}
-                  </Link>
-                </div>
-              )}
+      <div className="mx-auto w-full max-w-6xl px-4">
+        <div className="flex items-center justify-between gap-4 rounded-full border border-white/10 bg-white/5 px-4 py-3 shadow-[0_24px_70px_rgba(15,23,42,0.55)] backdrop-blur-2xl md:px-6">
+          <Link to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+            <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-600 text-xl font-semibold text-white shadow-lg shadow-primary-500/40">
+              <span className="drop-shadow-sm">🇺🇦</span>
             </div>
-          </div>
+            <div className="leading-tight text-white">
+              <p className="text-xs uppercase tracking-[0.4em] text-white/70">UAlearn</p>
+              <p className="text-sm font-semibold">Ukrainian Studio</p>
+            </div>
+            <span className="hidden items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100 md:inline-flex">
+              <SparklesIcon className="h-3.5 w-3.5" />
+              Free
+            </span>
+          </Link>
 
-          <div className="md:hidden flex items-center space-x-2">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`${
-                isHome
-                  ? 'text-slate-200 hover:text-white'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-              } focus:outline-none`}
-            >
-              {mobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
-      </div>
+          <nav className="hidden md:flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1">
+            {visibleItems.map(({ key, labelKey, path, icon: Icon }) => (
+              <Link key={key} to={path} className={linkClasses(isActive(path))}>
+                <span className={`flex h-5 w-5 items-center justify-center rounded-full ${
+                  isActive(path) ? 'bg-slate-900 text-white' : 'bg-white/10 text-white/70 group-hover:bg-white/20'
+                }`}>
+                  <Icon className="h-3.5 w-3.5" />
+                </span>
+                <span>{t(labelKey)}</span>
+              </Link>
+            ))}
+          </nav>
 
-      {mobileMenuOpen && (
-        <div className={mobileContainerClass}>
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {filteredNavigation.map((item) => {
-              const Icon = item.icon;
-              const active = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={mobileLinkClass(active)}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
-
+          <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher variant="compact" showLabels={false} />
             {user ? (
-              <div className={`border-t pt-4 mt-4 ${isHome ? 'border-white/10' : 'border-gray-200 dark:border-gray-800'}`}>
-                <div className="px-3 py-2">
-                  <div className={`text-base font-medium ${isHome ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
-                    {user.name || user.email}
-                  </div>
-                  <div className={`text-sm ${isHome ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
-                    {user.level} • {user.xp} XP • 🔥 {user.streak}
-                  </div>
-                </div>
-                <div className="px-3 py-2 flex items-center gap-3">
-                  <LanguageSwitcher variant="compact" showLabels={false} />
-                </div>
-                <Link
-                  to="/profile"
-                  className={mobileSecondaryClass}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <UserIcon className="w-5 h-5" />
-                  <span>{t('nav.profile')}</span>
-                </Link>
+              <>
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className={mobileLogoutClass}
+                  type="button"
+                  onClick={navigateToProfile}
+                  className="group flex items-center gap-3 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 pr-4 text-left text-sm text-white/80 transition hover:border-white/30 hover:bg-white/20"
                 >
-                  <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                  <span>{t('nav.logout')}</span>
+                  {renderAvatar()}
+                  <span className="leading-tight">
+                    <span className="block text-sm font-semibold text-white">{user.name || user.email}</span>
+                    <span className="text-xs text-white/60">{user.level} • {user.xp} XP • 🔥 {user.streak}</span>
+                  </span>
                 </button>
-              </div>
+                <Button variant="ghost" size="small" onClick={handleLogout} leftIcon={<ArrowRightOnRectangleIcon className="h-4 w-4" />}>
+                  {t('nav.logout')}
+                </Button>
+              </>
             ) : (
-              <div className={`border-t pt-4 mt-4 space-y-3 ${isHome ? 'border-white/10' : 'border-gray-200 dark:border-gray-800'}`}>
-                <Link
-                  to="/login"
-                  className={mobileSecondaryClass}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <UserIcon className="w-5 h-5" />
-                  <span>{t('auth.login')}</span>
-                </Link>
-                <Link
-                  to="/register"
-                  className={`${
-                    isHome
-                      ? 'flex items-center justify-center gap-2 px-3 py-2 rounded-md text-base font-medium bg-primary-500/80 hover:bg-primary-500 text-white'
-                      : 'flex items-center justify-center gap-2 px-3 py-2 rounded-md text-base font-medium bg-primary-600 text-white hover:bg-primary-700'
-                  }`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <ArrowRightOnRectangleIcon className="w-5 h-5" />
-                  <span>{t('auth.register')}</span>
-                </Link>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="small" onClick={() => navigate('/login')}>
+                  {t('auth.login')}
+                </Button>
+                <Button variant="primary" size="small" onClick={() => navigate('/register')}>
+                  {t('auth.register')}
+                </Button>
               </div>
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={() => setMobileOpen((prev) => !prev)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white hover:border-white/40 hover:bg-white/20 md:hidden"
+            aria-label="Toggle navigation"
+          >
+            {mobileOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+          </button>
+        </div>
+      </div>
+
+      {mobileOpen && (
+        <div className="md:hidden">
+          <div
+            className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+
+          <div className="fixed inset-x-0 top-0 z-50 overflow-hidden rounded-b-3xl border-b border-white/10 bg-slate-950 px-5 pb-8 pt-24 shadow-[0_40px_80px_rgba(15,23,42,0.65)]">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <div className="flex items-center gap-3 text-white">
+                {renderAvatar()}
+                <div>
+                  <p className="text-sm font-semibold">{user ? (user.name || user.email) : 'UAlearn'}</p>
+                  <p className="text-xs text-white/60">
+                    {user ? `${user.level} • ${user.xp} XP • 🔥 ${user.streak}` : t('home.heroBadge')}
+                  </p>
+                </div>
+              </div>
+              <LanguageSwitcher variant="compact" showLabels={false} />
+            </div>
+
+            <nav className="mt-6 space-y-3">
+              {visibleItems.map(({ key, labelKey, path, icon: Icon }) => (
+                <Link
+                  key={key}
+                  to={path}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center justify-between rounded-2xl border border-white/10 px-4 py-3 text-base font-medium text-white/80 transition ${
+                    isActive(path) ? 'bg-white/15 shadow-[0_18px_45px_rgba(56,189,248,0.25)]' : 'bg-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-white">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span>{t(labelKey)}</span>
+                  </div>
+                  <span className="text-xs uppercase tracking-[0.3em] text-white/40">Go</span>
+                </Link>
+              ))}
+            </nav>
+
+            <div className="mt-6 space-y-3">
+              {user ? (
+                <>
+                  <Button fullWidth onClick={navigateToProfile} leftIcon={<UserIcon className="h-5 w-5" />}>
+                    {t('nav.profile')}
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outline"
+                    onClick={handleLogout}
+                    leftIcon={<ArrowRightOnRectangleIcon className="h-5 w-5" />}
+                  >
+                    {t('nav.logout')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button fullWidth onClick={() => { setMobileOpen(false); navigate('/login'); }}>
+                    {t('auth.login')}
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outline"
+                    onClick={() => { setMobileOpen(false); navigate('/register'); }}
+                    leftIcon={<ArrowRightOnRectangleIcon className="h-5 w-5" />}
+                  >
+                    {t('auth.register')}
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 };
 

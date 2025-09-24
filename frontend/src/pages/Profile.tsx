@@ -118,6 +118,7 @@ const Profile: React.FC = () => {
 
   const completedAchievementCount = useMemo(() => achievements.length, [achievements]);
 
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">

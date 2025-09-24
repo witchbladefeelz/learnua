@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
+import PageContainer from '../components/layout/PageContainer';
 import { usersAPI } from '../services/api';
 import { PublicUserProfile } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -64,26 +65,28 @@ const UserProfile: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <LoadingSpinner size="large" />
-      </div>
+      <PageContainer>
+        <div className="surface-panel max-w-3xl mx-auto flex min-h-[200px] items-center justify-center text-slate-100">
+          <LoadingSpinner size="large" />
+        </div>
+      </PageContainer>
     );
   }
 
   if (error || !profile) {
     return (
-      <div className="flex flex-col items-center gap-6 text-gray-900 dark:text-gray-100">
-        <Card className="max-w-lg w-full text-center space-y-4 p-8">
-          <div className="text-4xl">🤔</div>
+      <PageContainer>
+        <div className="surface-panel max-w-xl mx-auto text-center space-y-6 text-slate-100">
+          <div className="text-5xl">🤔</div>
           <h1 className="text-2xl font-semibold">{t('publicProfile.notFound')}</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-300">{error || t('publicProfile.loadError')}</p>
+          <p className="text-sm text-slate-300">{error || t('publicProfile.loadError')}</p>
           <div className="flex justify-center">
             <Button variant="outline" onClick={() => navigate(-1)}>
               {t('publicProfile.backToLeaderboard')}
             </Button>
           </div>
-        </Card>
-      </div>
+        </div>
+      </PageContainer>
     );
   }
 
@@ -101,24 +104,25 @@ const UserProfile: React.FC = () => {
     : t('publicProfile.lastActiveNever');
 
   return (
-    <div className="space-y-8 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-bold">
-            {t('publicProfile.title')}
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('publicProfile.subtitle', { name: displayName })}
-          </p>
+    <PageContainer contentClassName="space-y-8 text-slate-100">
+      <div className="surface-panel space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold">
+              {t('publicProfile.title')}
+            </h1>
+            <p className="text-sm text-slate-300">
+              {t('publicProfile.subtitle', { name: displayName })}
+            </p>
+          </div>
         </div>
-      </div>
 
-      <Card className="p-6 md:p-8" padding="none">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <img
-              src={profile.avatar || 'https://cdn.jsdelivr.net/gh/identicons/jasonlong/png/128/default.png'}
-              alt={displayName}
+        <Card className="p-6 md:p-8" padding="none">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex items-center gap-5">
+              <img
+                src={profile.avatar || 'https://cdn.jsdelivr.net/gh/identicons/jasonlong/png/128/default.png'}
+                alt={displayName}
               className="w-24 h-24 md:w-28 md:h-28 rounded-2xl object-cover border-2 border-white shadow-lg dark:border-gray-700"
             />
             <div className="space-y-2">
@@ -169,27 +173,27 @@ const UserProfile: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              {t('publicProfile.achievementsTitle')}
-            </h3>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            {t('publicProfile.achievementsTitle')}
+          </h3>
+          <span className="text-sm text-slate-400">
               {profile.achievements?.length ?? 0}
             </span>
           </div>
 
           {achievements.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-slate-400">
               <div className="text-4xl mb-2">🌱</div>
               <p>{t('publicProfile.achievementsEmpty')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {achievements.map(item => (
-                <div key={item.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+                <div key={item.id} className="flex items-center gap-3 p-3 bg-white/8 rounded-lg border border-white/15">
                   <div className="text-2xl">{item.achievement.icon}</div>
                   <div>
-                    <div className="font-medium text-gray-900 dark:text-gray-100">{item.achievement.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-300">{item.achievement.description}</div>
+                    <div className="font-medium text-slate-100">{item.achievement.name}</div>
+                    <div className="text-sm text-slate-300">{item.achievement.description}</div>
                   </div>
                 </div>
               ))}
@@ -202,25 +206,25 @@ const UserProfile: React.FC = () => {
             <h3 className="text-lg font-semibold flex items-center gap-2">
               {t('publicProfile.lessonsTitle')}
             </h3>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-slate-400">
               {profile.completedLessons?.length ?? 0}
             </span>
           </div>
 
           {lessons.length === 0 ? (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-slate-400">
               <div className="text-4xl mb-2">📘</div>
               <p>{t('publicProfile.lessonsEmpty')}</p>
             </div>
           ) : (
             <div className="space-y-3">
               {lessons.map(completed => (
-                <div key={completed.id} className="flex items-center justify-between gap-3 p-3 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <div key={completed.id} className="flex items-center justify-between gap-3 p-3 rounded-lg border border-white/12 bg-white/6">
                   <div>
-                    <div className="font-semibold text-gray-900 dark:text-gray-100">
+                    <div className="font-semibold text-slate-100">
                       {completed.lesson?.title || t('publicProfile.lessonFallback')}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                    <div className="text-xs text-slate-400">
                       {new Date(completed.completedAt).toLocaleDateString(language === 'uk' ? 'uk-UA' : 'en-US', {
                         year: 'numeric',
                         month: 'short',
@@ -228,7 +232,7 @@ const UserProfile: React.FC = () => {
                       })}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center gap-3 text-sm text-slate-200">
                     <span>
                       {t('publicProfile.lessonsScore')}: {completed.score}%
                     </span>
@@ -242,13 +246,14 @@ const UserProfile: React.FC = () => {
           )}
         </Card>
       </div>
+    </div>
 
-      <div className="flex justify-center">
+    <div className="flex justify-center">
         <Link to="/leaderboard">
           <Button variant="outline">{t('publicProfile.backToLeaderboard')}</Button>
         </Link>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

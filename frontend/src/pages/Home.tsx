@@ -58,6 +58,7 @@ const Home: React.FC = () => {
     { name: t('home.categories.colors.title'), icon: '🎨', color: 'from-red-500 to-pink-500' },
   ];
 
+
   return (
     <div className="home-root text-slate-100">
       <div className="home-gradient" aria-hidden="true" />

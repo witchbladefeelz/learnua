@@ -39,6 +39,7 @@ const LessonDetail: React.FC = () => {
   const [completedLesson, setCompletedLesson] = useState<{ score: number; xpEarned: number } | null>(null);
   const [startedAt] = useState<number>(Date.now());
 
+
   useEffect(() => {
     if (!id) {
       navigate('/lessons');

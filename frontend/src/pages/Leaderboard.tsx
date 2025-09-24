@@ -44,6 +44,7 @@ const Leaderboard: React.FC = () => {
 
   const animalEmojis = ['🐶','🐱','🦊','🦁','🐻','🐼','🐨','🐯','🐰','🦄','🐸','🐧','🐹','🐦','🦉','🐙','🦋','🐢'];
 
+
   const getFallbackEmoji = (id: string) => {
     if (!id) {
       return animalEmojis[0];

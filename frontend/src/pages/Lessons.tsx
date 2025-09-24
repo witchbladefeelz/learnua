@@ -51,6 +51,7 @@ const Lessons: React.FC = () => {
 
   const displayedLessons = lessons;
 
+
   return (
     <PageContainer>
       <div className="surface-panel space-y-8 text-slate-100">
@@ -64,10 +65,10 @@ const Lessons: React.FC = () => {
             <button
               key={category.value}
               onClick={() => setCategoryFilter(category.value)}
-              className={`px-4 py-2 rounded-full border text-sm font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-full border text-sm font-medium transition-colors ${
                 categoryFilter === category.value
-                  ? 'bg-primary-600/90 text-white border-primary-500 shadow-lg shadow-primary-500/30'
-                  : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                  ? 'bg-primary-500 text-white border-transparent shadow-sm'
+                  : 'bg-white/8 text-slate-200 border-white/15 hover:bg-white/12'
               }`}
             >
               {category.label}

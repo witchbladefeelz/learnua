@@ -10,6 +10,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   rightIcon?: React.ReactNode;
 }
 
+type ButtonVariant = Exclude<ButtonProps['variant'], undefined>;
+type ButtonSize = Exclude<ButtonProps['size'], undefined>;
+
 const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
@@ -22,19 +25,19 @@ const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:opacity-60 disabled:cursor-not-allowed';
 
-  const variantClasses = {
-    primary: 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500 shadow-lg hover:shadow-xl transform hover:scale-105',
-    secondary: 'bg-secondary-600 hover:bg-secondary-700 text-white focus:ring-secondary-500 shadow-lg hover:shadow-xl transform hover:scale-105',
-    outline: 'border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-primary-500 dark:border-primary-400 dark:text-primary-300 dark:hover:bg-primary-500 dark:hover:text-white',
-    ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800',
-    danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500 shadow-lg hover:shadow-xl transform hover:scale-105',
+  const variantClasses: Record<ButtonVariant, string> = {
+    primary: 'bg-primary-500 text-white hover:bg-primary-400 focus-visible:ring-primary-400 shadow-sm',
+    secondary: 'bg-secondary-500 text-white hover:bg-secondary-400 focus-visible:ring-secondary-400 shadow-sm',
+    outline: 'border border-white/15 text-slate-100 hover:bg-white/10 focus-visible:ring-primary-400',
+    ghost: 'text-slate-200 hover:text-white hover:bg-white/10 focus-visible:ring-white/30',
+    danger: 'bg-rose-600 text-white hover:bg-rose-500 focus-visible:ring-rose-400 shadow-sm',
   };
 
-  const sizeClasses = {
-    small: 'px-3 py-1.5 text-sm',
-    medium: 'px-4 py-2 text-base',
+  const sizeClasses: Record<ButtonSize, string> = {
+    small: 'px-4 py-2 text-sm',
+    medium: 'px-5 py-2.5 text-base',
     large: 'px-6 py-3 text-lg',
   };
 
@@ -43,28 +46,33 @@ const Button: React.FC<ButtonProps> = ({
   const spinnerColor: 'primary' | 'secondary' | 'white' =
     variant === 'outline' || variant === 'ghost' ? 'primary' : 'white';
 
+  const variantKey = variant as ButtonVariant;
+  const sizeKey = size as ButtonSize;
+
+  const content = (
+    <span className="inline-flex items-center justify-center gap-2 text-current">
+      {loading && (
+        <LoadingSpinner size="small" color={spinnerColor} className="shrink-0" />
+      )}
+      {!loading && leftIcon && <span className="flex items-center justify-center">{leftIcon}</span>}
+      <span className="font-medium">{children}</span>
+      {!loading && rightIcon && <span className="flex items-center justify-center">{rightIcon}</span>}
+    </span>
+  );
+
   return (
     <button
       className={`
         ${baseClasses}
-        ${variantClasses[variant]}
-        ${sizeClasses[size]}
+        ${variantClasses[variantKey]}
+        ${sizeClasses[sizeKey]}
         ${fullWidth ? 'w-full' : ''}
         ${className}
       `}
       disabled={isDisabled}
       {...props}
     >
-      {loading && (
-        <LoadingSpinner size="small" color={spinnerColor} className="mr-2" />
-      )}
-      {!loading && leftIcon && (
-        <span className="mr-2">{leftIcon}</span>
-      )}
-      {children}
-      {!loading && rightIcon && (
-        <span className="ml-2">{rightIcon}</span>
-      )}
+      {content}
     </button>
   );
 };

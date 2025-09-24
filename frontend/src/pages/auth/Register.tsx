@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { SparklesIcon, BookOpenIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, BookOpenIcon, ShieldCheckIcon, FireIcon, StarIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 import { useAuth } from '../../contexts/AuthContext';
@@ -15,13 +15,49 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const [glowPos, setGlowPos] = useState({ x: 50, y: 50 });
+  const [pointerActive, setPointerActive] = useState(false);
+  const rafRef = useRef<number | null>(null);
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const inputClassName =
+    'w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40 transition-all';
+  const requiredLabel = t('auth.requiredFields');
+  const resolvedRequiredLabel = requiredLabel === 'auth.requiredFields' ? 'Required fields' : requiredLabel;
+
+  const glowStyle = {
+    '--auth-glow-x': `${glowPos.x}%`,
+    '--auth-glow-y': `${glowPos.y}%`,
+  } as React.CSSProperties;
+
+  const scheduleGlowUpdate = (xPercent: number, yPercent: number) => {
+    if (rafRef.current !== null) {
+      return;
+    }
+    rafRef.current = requestAnimationFrame(() => {
+      setGlowPos({ x: xPercent, y: yPercent });
+      rafRef.current = null;
+    });
+  };
+
+  const handlePointerMove: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const xPercent = ((event.clientX - rect.left) / rect.width) * 100;
+    const yPercent = ((event.clientY - rect.top) / rect.height) * 100;
+    setPointerActive(true);
+    scheduleGlowUpdate(Math.min(Math.max(xPercent, 5), 95), Math.min(Math.max(yPercent, 8), 92));
+  };
+
+  const handlePointerLeave = () => {
+    setPointerActive(false);
+    scheduleGlowUpdate(50, 50);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password || !confirmPassword) {
       toast.error('Please fill all required fields');
       return;
@@ -38,7 +74,7 @@ const Register: React.FC = () => {
     }
 
     setLoading(true);
-    
+
     try {
       const message = await register(email, password, name);
       toast.success(t('auth.registerSuccess'));
@@ -55,62 +91,85 @@ const Register: React.FC = () => {
     }
   };
 
-  const inputClassName =
-    'w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-slate-100 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40 transition-all';
-  const requiredLabel = t('auth.requiredFields');
-  const resolvedRequiredLabel = requiredLabel === 'auth.requiredFields' ? 'Required fields' : requiredLabel;
-
   return (
     <PageContainer contentClassName="w-full max-w-5xl mx-auto">
-      <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr]">
-        <div className="surface-panel space-y-6 overflow-hidden">
-          <div className="relative">
-            <div className="absolute -top-24 -left-10 h-40 w-40 rounded-full bg-secondary-400/30 blur-3xl" />
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-medium text-white/80">
+      <div className="auth-grid grid items-center gap-8 lg:grid-cols-[1.1fr_1fr]">
+        <div
+          className="auth-hero-panel p-8 md:p-10 space-y-6"
+          style={glowStyle}
+          data-pointer={pointerActive}
+          onMouseMove={handlePointerMove}
+          onMouseLeave={handlePointerLeave}
+        >
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur">
               <SparklesIcon className="h-4 w-4" />
               {t('auth.register')}
             </span>
+            <span className="auth-success-chip text-xs">
+              <StarIcon className="h-3.5 w-3.5" />
+              5 min setup
+            </span>
           </div>
+
           <h1 className="text-4xl font-semibold text-white">
             {t('home.getStarted')}
           </h1>
-          <p className="text-lg text-slate-300">
+          <p className="text-lg text-slate-200/80">
             Join a growing community of learners and track your Ukrainian progress every day.
           </p>
 
+          <div className="auth-divider" />
+
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+            <div className="auth-feature-card p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-100">
                 <BookOpenIcon className="h-4 w-4 text-primary-200" />
                 Interactive lessons
               </div>
-              <p className="mt-2 text-sm text-slate-400">
-                Practice vocabulary, grammar and listening with bite-sized exercises.
+              <p className="mt-2 text-sm text-slate-200/75">
+                Practice vocabulary, grammar and listening with immersive challenges.
               </p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+            <div className="auth-feature-card p-4">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-100">
                 <ShieldCheckIcon className="h-4 w-4 text-emerald-200" />
                 Safe & free
               </div>
-              <p className="mt-2 text-sm text-slate-400">
-                Secure authentication and no hidden costs — just pure learning.
+              <p className="mt-2 text-sm text-slate-200/75">
+                Secure authentication, zero ads, pure focus on language learning.
+              </p>
+            </div>
+            <div className="auth-feature-card p-4 sm:col-span-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-100">
+                <FireIcon className="h-4 w-4 text-orange-200" />
+                Streak rewards
+              </div>
+              <p className="mt-2 text-sm text-slate-200/75">
+                Unlock achievements and bonus XP as you maintain daily streaks.
               </p>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+          <div className="rounded-2xl border border-white/12 bg-white/8 p-4 text-sm text-slate-200/85">
             <p>
               {t('auth.hasAccount')}{' '}
-              <Link to="/login" className="text-primary-200 underline decoration-primary-400/60 hover:decoration-primary-100">
+              <Link
+                to="/login"
+                className="text-primary-200 underline decoration-primary-400/60 hover:decoration-primary-100"
+              >
                 {t('auth.login')}
               </Link>
             </p>
           </div>
         </div>
 
-        <div className="surface-panel relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-secondary-500/10 to-transparent" />
+        <div
+          className="auth-form-panel p-8 md:p-10"
+          style={glowStyle}
+          onMouseMove={handlePointerMove}
+          onMouseLeave={handlePointerLeave}
+        >
           <div className="relative space-y-6">
             <div className="text-center space-y-2">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg shadow-primary-500/30">
