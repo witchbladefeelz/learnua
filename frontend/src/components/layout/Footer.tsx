@@ -1,11 +1,12 @@
 import React from 'react';
+import Emoji from '../ui/Emoji';
 
 const Footer: React.FC = () => {
   return (
     <footer className="w-full border-t border-white/10 bg-slate-950/85">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-6 py-10 text-center text-white/80">
         <div className="flex items-center justify-center gap-3">
-          <span className="text-lg">🇺🇦</span>
+          <Emoji symbol="🇺🇦" decorative className="text-xl drop-shadow-sm" />
           <span className="text-base font-semibold tracking-wide">UAlearn</span>
         </div>
         <p className="text-sm">
@@ -20,3 +21,4 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
+

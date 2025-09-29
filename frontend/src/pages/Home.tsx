@@ -1,4 +1,5 @@
 import React from 'react';
+import Emoji from '../components/ui/Emoji';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from '../contexts/LanguageContext';
@@ -108,7 +109,7 @@ const Home: React.FC = () => {
             <div className="abstract-orb" aria-hidden="true" />
             <div className="absolute inset-0 bg-gradient-to-tr from-primary-500/20 to-secondary-500/10 rounded-[36px] border border-white/10 backdrop-blur-xl flex items-center justify-center">
               <div className="text-center space-y-4 px-6">
-                <span className="text-6xl md:text-7xl block">🇺🇦</span>
+                <Emoji symbol="🇺🇦" className="block text-6xl md:text-7xl" label="Ukrainian flag" />
                 <p className="text-slate-300 text-lg max-w-sm mx-auto">
                   {t('home.heroOrbCaption')}
                 </p>
@@ -190,3 +191,5 @@ const Home: React.FC = () => {
 };
 
 export default Home;
+
+

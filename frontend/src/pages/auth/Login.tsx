@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
 import Button from '../../components/ui/Button';
+import Emoji from '../../components/ui/Emoji';
 import PageContainer from '../../components/layout/PageContainer';
 
 const Login: React.FC = () => {
@@ -157,7 +158,7 @@ const Login: React.FC = () => {
           <div className="relative space-y-6">
             <div className="text-center space-y-2">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 shadow-lg shadow-primary-500/30">
-                <span className="text-2xl">🇺🇦</span>
+                <Emoji symbol="🇺🇦" decorative className="text-3xl" />
               </div>
               <h2 className="text-2xl font-semibold text-white">{t('auth.login')}</h2>
               <p className="text-sm text-slate-300">
@@ -222,3 +223,4 @@ const Login: React.FC = () => {
 };
 
 export default Login;
+

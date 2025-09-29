@@ -4,6 +4,17 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+@font-face {
+  font-family: 'Noto Color Emoji';
+  src: url('./assets/fonts/NotoColorEmoji.ttf') format('truetype');
+  font-display: swap;
+}
+
+.emoji-font {
+  font-family: 'Noto Color Emoji', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Emoji', sans-serif;
+  font-variant-emoji: emoji;
+}
+
 :root {
   color-scheme: dark;
   --theme-wave-x: 50%;
@@ -53,7 +64,7 @@ html.theme-wave.theme-wave-active::before {
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', 'Noto Color Emoji', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -581,3 +592,5 @@ code {
   width: 300px;
   height: 300px;
 }
+
+

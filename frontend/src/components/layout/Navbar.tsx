@@ -16,6 +16,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import Button from '../ui/Button';
+import Emoji from '../ui/Emoji';
 
 interface NavItem {
   key: string;
@@ -98,7 +99,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between gap-4 rounded-full border border-white/10 bg-white/5 px-4 py-3 shadow-[0_24px_70px_rgba(15,23,42,0.55)] backdrop-blur-2xl md:px-6">
           <Link to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-600 text-xl font-semibold text-white shadow-lg shadow-primary-500/40">
-              <span className="drop-shadow-sm">🇺🇦</span>
+              <Emoji symbol="🇺🇦" decorative className="text-2xl drop-shadow-sm" />
             </div>
             <div className="leading-tight text-white">
               <p className="text-xs uppercase tracking-[0.4em] text-white/70">UAlearn</p>

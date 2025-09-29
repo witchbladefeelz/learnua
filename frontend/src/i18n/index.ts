@@ -76,3 +76,6 @@ export const getSavedLanguage = (): Language => {
 export const saveLanguage = (language: Language): void => {
   localStorage.setItem('language', language);
 };
+
+
+
