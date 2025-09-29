@@ -46,6 +46,15 @@ const Navbar: React.FC = () => {
     [user],
   );
 
+  const dynamicMaxWidth = useMemo(() => {
+    const navCount = visibleItems.length;
+    const baseWidth = 520;
+    const perNav = 120;
+    const authWidth = user ? 240 : 180;
+    return Math.min(1280, baseWidth + navCount * perNav + authWidth);
+  }, [visibleItems.length, user]);
+
+
   const isActive = (path: string) => {
     if (path === '/') {
       return location.pathname === '/';
@@ -95,9 +104,9 @@ const Navbar: React.FC = () => {
   return (
     <header className="fixed inset-x-0 top-3 sm:top-5 z-50 flex justify-center pointer-events-none">
 
-      <div className="w-full max-w-6xl px-4 pointer-events-auto">
+      <div className="w-full px-4 pointer-events-auto" style={{ margin: '0 auto', maxWidth: dynamicMaxWidth }}>
         <div className="flex items-center justify-between gap-4 rounded-full border border-white/10 bg-white/5 px-4 py-3 shadow-[0_24px_70px_rgba(15,23,42,0.55)] backdrop-blur-2xl md:px-6">
-          <Link to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
+          <Link to="/" className="flex items-center gap-3 shrink-0" onClick={() => setMobileOpen(false)}>
             <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 via-secondary-500 to-primary-600 text-xl font-semibold text-white shadow-lg shadow-primary-500/40">
               <Emoji symbol="🇺🇦" decorative className="text-2xl drop-shadow-sm" />
             </div>
@@ -111,7 +120,7 @@ const Navbar: React.FC = () => {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1">
+          <nav className="hidden md:flex flex-1 items-center justify-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1 md:min-w-0">
             {visibleItems.map(({ key, labelKey, path, icon: Icon }) => (
               <Link key={key} to={path} className={linkClasses(isActive(path))}>
                 <span className={`flex h-5 w-5 items-center justify-center rounded-full ${
@@ -124,7 +133,7 @@ const Navbar: React.FC = () => {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 shrink-0">
             <LanguageSwitcher variant="compact" showLabels={false} />
             {user ? (
               <>
@@ -248,3 +257,7 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+
+
+
+
